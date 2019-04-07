@@ -1,5 +1,17 @@
+require 'tempfile'
 require 'vimrunner'
 require 'vimrunner/rspec'
+RSpec.configure do |config|
+  config.around(:example) do |example|
+    Tempfile.open("vim-ruby-vfile.txt") do |tmp|
+      @messages = tmp.path
+      example.run
+      next unless example.exception
+
+      warn tmp.read
+    end
+  end
+end
 
 RSpec.configure do |config|
   # reset globals to default values before each test
@@ -20,6 +32,7 @@ Vimrunner::RSpec.configure do |config|
     vim.add_plugin(File.expand_path('../vim', __FILE__), 'plugin/syntax_test.vim')
     vim.set 'expandtab'
     vim.set 'shiftwidth', 2
+    vim.normal ":let g:ruby_indent_debug = 1\r"
     vim
   end
 
@@ -29,7 +42,10 @@ Vimrunner::RSpec.configure do |config|
     IO.write filename, string
 
     vim.edit filename
-    vim.normal 'gg=G'
+    vim.normal ":messages clear\r"
+    vim.set 'vfile', @messages
+    vim.normal ":12verbose normal gg=G\r"
+    vim.set 'vfile'
     vim.write
 
     expect(IO.read(filename)).to eq string

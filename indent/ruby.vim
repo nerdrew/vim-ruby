@@ -14,6 +14,10 @@ if exists("b:did_indent")
 endif
 let b:did_indent = 1
 
+if !exists('g:ruby_indent_debug')
+  let g:ruby_indent_debug = 0
+endif
+
 if !exists('g:ruby_indent_access_modifier_style')
   " Possible values: "normal", "indent", "outdent"
   let g:ruby_indent_access_modifier_style = 'normal'
@@ -204,7 +208,9 @@ function! GetRubyIndent(...) abort
     let indent = call(function(callback_name), [indent_info])
 
     if indent >= 0
-"      Decho "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      if g:ruby_indent_debug
+        echom "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      endif
       return indent
     endif
   endfor
@@ -224,7 +230,9 @@ function! GetRubyIndent(...) abort
     let indent = call(function(callback_name), [indent_info])
 
     if indent >= 0
-"      Decho "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      if g:ruby_indent_debug
+        echom "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      endif
       return indent
     endif
   endfor
@@ -250,7 +258,9 @@ function! GetRubyIndent(...) abort
     let indent = call(function(callback_name), [indent_info])
 
     if indent >= 0
-"      Decho "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      if g:ruby_indent_debug
+        echom "Match: ".callback_name." indent=".indent." info=".string(indent_info)
+      endif
       return indent
     endif
   endfor
@@ -280,7 +290,9 @@ function! GetRubyIndent(...) abort
   " }}}2
 
   " By default, just return the previous line's indent
-"  Decho "Default case matched"
+  if g:ruby_indent_debug
+    echom "Default case matches: indent=".indent." info=".string(indent_info)
+  endif
   return indent(indent_info.plnum)
 endfunction
 
