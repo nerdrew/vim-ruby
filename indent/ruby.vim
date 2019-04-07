@@ -90,7 +90,7 @@ let s:ruby_indent_keywords =
       \ '^\s*\zs\<\%(module\|class\|if\|for' .
       \   '\|while\|until\|else\|elsif\|case\|when\|unless\|begin\|ensure\|rescue' .
       \   '\|\%(\K\k*[!?]\?\s\+\)\=def\):\@!\>' .
-      \ '\|\%([=,*/%+-]\|<<\|>>\|:\s\)\s*\zs' .
+      \ '\|\%([=,*/%+-]\|<<\|>>\|=>\|:\s\)\s*\zs' .
       \    '\<\%(if\|for\|while\|until\|case\|unless\|begin\):\@!\>'
 
 " Regex used for words that, at the start of a line, remove a level of indent.
@@ -101,7 +101,7 @@ let s:ruby_deindent_keywords =
 "let s:end_start_regex = '\%(^\|[^.]\)\<\%(module\|class\|def\|if\|for\|while\|until\|case\|unless\|begin\|do\)\>'
 " TODO: the do here should be restricted somewhat (only at end of line)?
 let s:end_start_regex =
-      \ '\C\%(^\s*\|[=,*/%+\-|;{]\|<<\|>>\|:\s\)\s*\zs' .
+      \ '\C\%(^\s*\|[=,*/%+\-|;{]\|<<\|>>\|=>\|:\s\)\s*\zs' .
       \ '\<\%(module\|class\|if\|for\|while\|until\|case\|unless\|begin' .
       \   '\|\%(\K\k*[!?]\?\s\+\)\=def\):\@!\>' .
       \ '\|\%(^\|[^.:@$]\)\@<=\<do:\@!\>'
@@ -127,7 +127,7 @@ let s:continuation_regex =
 
 " Regex that defines continuable keywords
 let s:continuable_regex =
-      \ '\C\%(^\s*\|[=,*/%+\-|;{]\|<<\|>>\|:\s\)\s*\zs' .
+      \ '\C\%(^\s*\|[=,*/%+\-|;{]\|<<\|>>\|=>\|:\s\)\s*\zs' .
       \ '\<\%(if\|for\|while\|until\|unless\):\@!\>'
 
 " Regex that defines bracket continuations
@@ -600,7 +600,7 @@ function! s:AfterEndKeyword(pline_info) abort
   let info = a:pline_info
   " If the previous line ended with an "end", match that "end"s beginning's
   " indent.
-  let col = s:Match(info.plnum, '\%(^\|[^.:@$]\)\<end\>\s*\%(#.*\)\=$')
+  let col = s:Match(info.plnum, '\%(^\|[^.:@$]\)\<end\>')
   if col > 0
     call cursor(info.plnum, col)
     if searchpair(s:end_start_regex, '', s:end_end_regex, 'bW',
@@ -736,7 +736,7 @@ function! s:IsInStringDelimiter(lnum, col) abort
 endfunction
 
 function! s:IsAssignment(str, pos) abort
-  return strpart(a:str, 0, a:pos - 1) =~ '=\s*$'
+  return strpart(a:str, 0, a:pos - 1) =~ '\(=>\|:\|=\)\s*$'
 endfunction
 
 " Find line above 'lnum' that isn't empty, in a comment, or in a string.

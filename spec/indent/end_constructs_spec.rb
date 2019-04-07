@@ -20,6 +20,18 @@ describe "Indenting" do
     EOF
 
     assert_correct_indenting <<~EOF
+      something.map do |c|
+        c; end.join(",")
+      boom
+    EOF
+
+    assert_correct_indenting <<~EOF
+      if something
+        values; end.map { |v| v * 2 }
+      boom
+    EOF
+
+    assert_correct_indenting <<~EOF
       foo do
         foo = 3 . class
         foo = lambda { class One; end }

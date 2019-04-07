@@ -108,6 +108,18 @@ describe "Indenting" do
       EOF
 
       assert_correct_indenting <<~EOF
+        variable = if something == something_else
+                     another_variable = if nothing == nothing_else
+                                          boom
+                                        end
+                   elsif other == none
+                     none
+                   else
+                     other
+                   end
+      EOF
+
+      assert_correct_indenting <<~EOF
         variable = while
                      break something
                    end
@@ -120,6 +132,13 @@ describe "Indenting" do
                        empty?
                      something
                    end
+      EOF
+
+      assert_correct_indenting <<~EOF
+        foo = if something
+                values
+              end.map { |v| v * 2 }
+        boom
       EOF
 
       vim.command 'let g:ruby_indent_assignment_style = "variable"'
@@ -144,6 +163,18 @@ describe "Indenting" do
       EOF
 
       assert_correct_indenting <<~EOF
+        variable = if something == something_else
+          another_variable = if nothing == nothing_else
+            boom
+          end
+        elsif other == none
+          none
+        else
+          other
+        end
+      EOF
+
+      assert_correct_indenting <<~EOF
         variable = while
           break something
         end
@@ -156,6 +187,49 @@ describe "Indenting" do
             empty?
           something
         end
+      EOF
+
+      assert_correct_indenting <<~EOF
+        foo = values.map do |value|
+          another_value
+        end
+      EOF
+
+      assert_correct_indenting <<~EOF
+        foo = if something
+          values
+        end.map { |v| v * 2 }
+      EOF
+
+      assert_correct_indenting <<~EOF
+        data = create(
+          :some_data,
+          foo: "bar",
+          something: "else"
+        )
+      EOF
+
+      assert_correct_indenting <<~EOF
+        variable = {
+          key: if condition
+            value
+          else
+            other_value
+          end,
+          next_key: if condition
+            value
+          else
+            other_value
+          end,
+          "another_key" => if condition
+            {
+              boom: 1
+            }
+          else
+            other_value
+          end,
+          1 => 2
+        }
       EOF
     end
   end
